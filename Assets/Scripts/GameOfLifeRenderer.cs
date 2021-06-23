@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System.Drawing;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using GameOfLife;
@@ -23,17 +24,22 @@ public class GameOfLifeRenderer : MonoBehaviour
         {0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0},
         {1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0}
         };
-    GameOfLifeClass game; 
+    GameOfLifeClass game;
+
+    public GameObject Prefab;
+    public int size = 64;
+
+    GameObject cells;
+    List<GameObject> objectPool; 
     // Start is called before the first frame update
-    void Start()
+    void Start()=>StartSimulation(RandomPatternGenerator(size,size));
+    void StartSimulation(int[,] Size)
     {
-        int size = 64;
-        game = new GameOfLifeClass(RandomPatternGenerator(size,size));
+        game = new GameOfLifeClass(Size);
 
-
-
-        ObjectPool = new List<GameObject>();
+        objectPool = new List<GameObject>();
         cells = new GameObject("cells");
+
         int width = game.gridPattern.GetLength(0);
         int hight = game.gridPattern.GetLength(1);
 
@@ -43,6 +49,41 @@ public class GameOfLifeRenderer : MonoBehaviour
         // RenderGeneration(game.gridPattern);
         
         StartCoroutine("StartCycles");
+    }
+    IEnumerator StartCycles(){
+        while (enabled){
+            RenderGeneration(game.gridPattern);
+            game.CalculateNextGen();
+            yield return new WaitForSeconds(0.020f);
+        }
+    }
+  
+    void RenderGeneration(int[,] grid,bool redraw = true){
+        int width = grid.GetLength(0);
+        int hight = grid.GetLength(1);
+        int aliveCells = 0;
+
+        if (redraw) foreach (var cell in objectPool)
+        {
+            cell.SetActive(false);
+        }
+
+        for (int Y = 0; Y < hight; Y++)
+        {
+            for (int X = 0; X < width; X++)
+            {
+                if (grid[X,Y] >= 1){
+                    if (objectPool.Count <= aliveCells){
+                        objectPool.Add(Instantiate(Prefab,cells.transform));
+                    }
+                    if (redraw) objectPool[aliveCells].SetActive(true);
+                    objectPool[aliveCells].transform.position = new Vector3(hight - Y,width - X);
+                    aliveCells ++;
+
+                }
+            }
+        }
+        
     }
     public int[,] RandomPatternGenerator(int width, int hight){
         int[,] output = new int[width,hight];
@@ -54,47 +95,5 @@ public class GameOfLifeRenderer : MonoBehaviour
             }
         }
         return output;
-    }
-    public GameObject Prefab;
-    GameObject cells;
-    List<GameObject> ObjectPool;
-    IEnumerator StartCycles(){
-        while (enabled){
-            RenderGeneration(game.gridPattern);
-            game.CalculateNextGen();
-            yield return new WaitForSeconds(0.020f);
-        }
-    }
-    void Update()
-    {
-       
-    }
-
-    void RenderGeneration(int[,] grid,bool redraw = true){
-        int width = grid.GetLength(0);
-        int hight = grid.GetLength(1);
-        int aliveCells = 0;
-
-        if (redraw) foreach (var cell in ObjectPool)
-        {
-            cell.SetActive(false);
-        }
-
-        for (int Y = 0; Y < hight; Y++)
-        {
-            for (int X = 0; X < width; X++)
-            {
-                if (grid[X,Y] >= 1){
-                    if (ObjectPool.Count <= aliveCells){
-                        ObjectPool.Add(Instantiate(Prefab,cells.transform));
-                    }
-                    if (redraw) ObjectPool[aliveCells].SetActive(true);
-                    ObjectPool[aliveCells].transform.position = new Vector3(hight - Y,width - X);
-                    aliveCells ++;
-
-                }
-            }
-        }
-        
     }
 }
