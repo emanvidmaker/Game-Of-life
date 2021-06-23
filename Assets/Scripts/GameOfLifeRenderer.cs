@@ -23,27 +23,77 @@ public class GameOfLifeRenderer : MonoBehaviour
         {0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0},
         {1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0}
         };
+    List<int[,]> iterations;
+
     GameOfLifeClass game; 
+    Camera Camera;
     // Start is called before the first frame update
     void Start()
     {
-        int size = 64;
+        int size = 16;
         game = new GameOfLifeClass(RandomPatternGenerator(size,size));
 
 
 
-        ObjectPool = new List<GameObject>();
+        objectPool = new List<GameObject>();
+        iterations = new List<int[,]>(); 
         cells = new GameObject("cells");
         int width = game.gridPattern.GetLength(0);
         int hight = game.gridPattern.GetLength(1);
 
-        var main = Camera.main;
-        main.orthographicSize = Mathf.Sqrt(width*hight)*0.6f;
-        main.transform.position = new Vector3(width/2,hight/2,main.transform.position.z);
+        Camera = Camera.main;
+        
+        Camera.orthographicSize = Mathf.Sqrt(width*hight)*0.55f;
+        Camera.transform.position = new Vector3(width/2,hight/2,Camera.transform.position.z);
         // RenderGeneration(game.gridPattern);
         
         StartCoroutine("StartCycles");
     }
+      public GameObject Prefab;
+    GameObject cells;
+    List<GameObject> objectPool;
+    IEnumerator StartCycles(){
+        for (int i = 0; i < 100; i++)
+        {
+            iterations.Add(game.gridPattern);
+            RenderGeneration(game.gridPattern,i,false);
+            game.CalculateNextGen();
+            Camera.transform.position += new Vector3(0,0,1);
+            yield return new WaitForSeconds(0.020f);
+        }
+    }
+    int aliveCells = 0;
+
+    void RenderGeneration(int[,] grid, int Z = 0 , bool redraw = true){
+        int width = grid.GetLength(0);
+        int hight = grid.GetLength(1);
+
+        if (redraw){
+            aliveCells = 0;
+            foreach (var cell in objectPool)
+            {
+                cell.SetActive(false);
+            }
+        }
+
+        for (int Y = 0; Y < hight; Y++)
+        {
+            for (int X = 0; X < width; X++)
+            {
+                if (grid[X,Y] >= 1){
+                    if (objectPool.Count <= aliveCells){
+                        objectPool.Add(Instantiate(Prefab,cells.transform));
+                    }
+                    if (redraw) objectPool[aliveCells].SetActive(true);
+                    objectPool[aliveCells].transform.position = new Vector3(hight - Y,width - X,Z);
+                    aliveCells ++;
+
+                }
+            }
+        }
+        
+    }
+
     public int[,] RandomPatternGenerator(int width, int hight){
         int[,] output = new int[width,hight];
         for (int Y = 0; Y < hight; Y++)
@@ -55,46 +105,5 @@ public class GameOfLifeRenderer : MonoBehaviour
         }
         return output;
     }
-    public GameObject Prefab;
-    GameObject cells;
-    List<GameObject> ObjectPool;
-    IEnumerator StartCycles(){
-        while (enabled){
-            RenderGeneration(game.gridPattern);
-            game.CalculateNextGen();
-            yield return new WaitForSeconds(0.020f);
-        }
-    }
-    void Update()
-    {
-       
-    }
 
-    void RenderGeneration(int[,] grid,bool redraw = true){
-        int width = grid.GetLength(0);
-        int hight = grid.GetLength(1);
-        int aliveCells = 0;
-
-        if (redraw) foreach (var cell in ObjectPool)
-        {
-            cell.SetActive(false);
-        }
-
-        for (int Y = 0; Y < hight; Y++)
-        {
-            for (int X = 0; X < width; X++)
-            {
-                if (grid[X,Y] >= 1){
-                    if (ObjectPool.Count <= aliveCells){
-                        ObjectPool.Add(Instantiate(Prefab,cells.transform));
-                    }
-                    if (redraw) ObjectPool[aliveCells].SetActive(true);
-                    ObjectPool[aliveCells].transform.position = new Vector3(hight - Y,width - X);
-                    aliveCells ++;
-
-                }
-            }
-        }
-        
-    }
 }
