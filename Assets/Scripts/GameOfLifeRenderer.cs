@@ -24,18 +24,19 @@ public class GameOfLifeRenderer : MonoBehaviour
         {0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0},
         {1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0}
         };
-    GameOfLifeClass game;
 
     public GameObject Prefab;
     public int size = 64;
-
+    GameOfLifeClass game;
     GameObject cells;
     List<GameObject> objectPool; 
+
+    int aliveCells = 0;
     // Start is called before the first frame update
     void Start()=>StartSimulation(RandomPatternGenerator(size,size));
-    void StartSimulation(int[,] Size)
+    void StartSimulation(int[,] inputGrid)
     {
-        game = new GameOfLifeClass(Size);
+        game = new GameOfLifeClass(inputGrid);
 
         objectPool = new List<GameObject>();
         cells = new GameObject("cells");
@@ -46,7 +47,6 @@ public class GameOfLifeRenderer : MonoBehaviour
         var main = Camera.main;
         main.orthographicSize = Mathf.Sqrt(width*hight)*0.6f;
         main.transform.position = new Vector3(width/2,hight/2,main.transform.position.z);
-        // RenderGeneration(game.gridPattern);
         
         StartCoroutine("StartCycles");
     }
@@ -61,11 +61,14 @@ public class GameOfLifeRenderer : MonoBehaviour
     void RenderGeneration(int[,] grid,bool redraw = true){
         int width = grid.GetLength(0);
         int hight = grid.GetLength(1);
-        int aliveCells = 0;
+        
 
-        if (redraw) foreach (var cell in objectPool)
-        {
-            cell.SetActive(false);
+        if (redraw){
+            aliveCells = 0;
+            foreach (var cell in objectPool)
+            {
+                cell.SetActive(false);
+            }
         }
 
         for (int Y = 0; Y < hight; Y++)
