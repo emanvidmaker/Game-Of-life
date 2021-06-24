@@ -6,23 +6,23 @@ using GameOfLife;
 
 public class GameOfLifeRenderer : MonoBehaviour
 {
-     public static int[,] startPattern = new int[16, 16]{
-        {1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
+     public int[,] startPattern = new int[16, 16]{
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
         {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-        {0,0,1,0,0,0,0,1,1,0,0,0,0,0,0,0},
-        {0,0,1,0,0,0,1,0,1,0,0,0,0,0,0,0},
-        {1,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0}
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
         };
 
     public GameObject Prefab;
@@ -30,11 +30,11 @@ public class GameOfLifeRenderer : MonoBehaviour
     GameOfLifeClass game;
     GameObject cells;
     List<GameObject> objectPool; 
-
+    public bool isRendering;
     int aliveCells = 0;
     // Start is called before the first frame update
-    void Start()=>StartSimulation(RandomPatternGenerator(size,size));
-    void StartSimulation(int[,] inputGrid)
+    // void Start()=>StartSimulation(RandomPatternGenerator(size,size));
+    public void StartSimulation(int[,] inputGrid)
     {
         game = new GameOfLifeClass(inputGrid);
 
@@ -50,11 +50,15 @@ public class GameOfLifeRenderer : MonoBehaviour
         
         StartCoroutine("StartCycles");
     }
+    
     IEnumerator StartCycles(){
+        RenderGeneration(game.gridPattern);
+        yield return new WaitForSeconds(0.20f); //trick the user into seeing their pattern more time
+        
         while (enabled){
-            RenderGeneration(game.gridPattern);
             game.CalculateNextGen();
             yield return new WaitForSeconds(0.020f);
+            RenderGeneration(game.gridPattern);
         }
     }
   
@@ -80,7 +84,7 @@ public class GameOfLifeRenderer : MonoBehaviour
                         objectPool.Add(Instantiate(Prefab,cells.transform));
                     }
                     if (redraw) objectPool[aliveCells].SetActive(true);
-                    objectPool[aliveCells].transform.position = new Vector3(hight - Y,width - X);
+                    objectPool[aliveCells].transform.position = new Vector3(width - X,hight - Y);
                     aliveCells ++;
 
                 }
