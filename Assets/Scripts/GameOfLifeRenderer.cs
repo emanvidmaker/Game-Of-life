@@ -90,7 +90,7 @@ public class GameOfLifeRenderer : MonoBehaviour
                         var cell = Instantiate(Prefab,cells.transform);
                         objectPool.Add(cell);
                     // if (redraw) objectPool[aliveCells].SetActive(true);
-                    objectPool[aliveCells].transform.position = new Vector3(width - X,hight - Y,z);
+                    objectPool[aliveCells].transform.position = new Vector3(width - X,z+.05f,hight - Y);
                     aliveCells ++;
 
                 }
