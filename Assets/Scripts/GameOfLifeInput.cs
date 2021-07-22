@@ -37,6 +37,8 @@ public class GameOfLifeInput : MonoBehaviour
     public GridLayoutGroup uiGrid;
     public GameOfLifeRenderer _renderer;
     List<GameObject> buttonPool;
+
+    public Color colorDead,colorDeadAlt,colorAlive;
     
     void Start()
     {

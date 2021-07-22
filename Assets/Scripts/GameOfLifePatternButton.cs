@@ -15,13 +15,22 @@ public class GameOfLifePatternButton : MonoBehaviour
             }
         }
     private Vector2Int _pos ;
+    static GameOfLifeInput mannager;
+
+    void Start(){
+    }
 
    public void SetCell(){
         GameOfLifeInput.storedPattern[pos.x,pos.y] = (GameOfLifeInput.storedPattern[pos.x,pos.y] == 1)? 0 : 1;
         UpdateCell();
    }
     public void UpdateCell(){
+        if (!mannager) mannager = FindObjectOfType<GameOfLifeInput>();
+
         GameOfLifeInput.storedPattern[pos.x,pos.y] = (GameOfLifeInput.storedPattern[pos.x,pos.y] == 0)? 0 : 1;
-        GetComponent<Image>().color = (GameOfLifeInput.storedPattern[pos.x,pos.y] == 0)? (((pos.x+pos.y)%2 == 0)?Color.white:Color.gray) : Color.black;;
+        GetComponent<Image>().color = 
+        (GameOfLifeInput.storedPattern[pos.x,pos.y] == 0)? 
+        (((pos.x+pos.y)%2 == 0)?mannager.colorDead : mannager.colorDeadAlt)
+         : mannager.colorAlive;
     }
 }
