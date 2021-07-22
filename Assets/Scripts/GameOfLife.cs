@@ -1,4 +1,5 @@
-﻿/*
+﻿using System.Diagnostics;
+/*
  MIT License
 -----------
 
@@ -29,10 +30,10 @@ OTHER DEALINGS IN THE SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
-
+using UnityEngine;
 namespace GameOfLife
 {
-    public class GameOfLifeClass
+    public class GameOfLifeClass  
     {
         public int[,] gridPattern;
         public GameOfLifeClass(int[,] gridPattern)
@@ -42,7 +43,7 @@ namespace GameOfLife
 
         public void CalculateNextGen()
         {
-            gridPattern = CalculateNextGen(gridPattern);
+                gridPattern = CalculateNextGen(gridPattern);
         }
         public static int[,] CalculateNextGen(int[,] grid) //in case you need to render a pattern with out overwrite the previous one
         {
@@ -61,7 +62,7 @@ namespace GameOfLife
                     //The Rules
                     if (currentCell == 1)
                     { //if on
-                        if (neighbors == 1) { currentCell = 0; } //has only 1 neighbors then it turns OFF in the next turn. (SOLITUDE)
+                        if (neighbors <= 1) { currentCell = 0; } //has only 1 neighbors then it turns OFF in the next turn. (SOLITUDE)
                         if (neighbors >= 4) { currentCell = 0; } //has 4 or more neighbors then it turns OFF in the next turn. (OVERPOPULATION)
                         if ((neighbors == 2) || (neighbors == 3)) { currentCell = 1; }// has 2 or 3 neighbors then it remains ON in the next turn.
                     }
